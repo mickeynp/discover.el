@@ -26,22 +26,6 @@
 
 (defconst discover-context-menus
   '(
-    ;; (test
-    ;;  (description "Test Description for `ls'")
-    ;;  (man-page "ls")
-    ;;  (actions
-    ;;   ("l" "Long Listing Format" nil)
-    ;;   ("s" "Short Listing Format" nil))
-    ;;  (switches
-    ;;   ("-a" "Show entries starting with .")
-    ;;   ("-h" "Print sizes in human readable format"))
-    ;;  (arguments
-    ;;   ("-fo" "format across" "--format="
-    ;;    (lambda (dummy) (interactive)
-    ;;      (ido-completing-read '("across" "commas" "horizontal" "long"
-    ;;                             "single-column" "verbose" "vertical"))))))
-
-
     ;; Dired
     (dired
      (description "DIRectory EDitor")
@@ -111,8 +95,7 @@
       ;; prefix commands for further nesting
       ("%" "do by regexp ..." makey-key-mode-popup-dired-regexp)
       ("*" "mark ..." makey-key-mode-popup-dired-marking)
-      ("M-s" "isearch ..." makey-key-mode-popup-dired-isearch-meta)
-      ))
+      ("M-s" "isearch ..." makey-key-mode-popup-dired-isearch-meta)))
 
     ;; These three context menus should drive home how many layers of
     ;; key bindings dired has!
@@ -187,11 +170,10 @@
       ("o" "open rectangle" open-rectangle)
       ("r" "copy rectangle to register" copy-rectangle-to-register)
       ("t" "string rectangle" string-rectangle)
-      ("y" "yank rectangle" yank-rectangle))
+      ("y" "yank rectangle" yank-rectangle)
       ("b" "bookmark jump" bookmark-jump)
       ("l" "bookmark bmenu list" bookmark-bmenu-list)
       ("m" "bookmark set" bookmark-set)
-
       ("+" "increment register" increment-register)
       ("C-@" "point to register" point-to-register)
       ("C-SPC" "point to register" point-to-register)
@@ -203,7 +185,7 @@
       ("n" "number to register" number-to-register)
       ("s" "copy to register" copy-to-register)
       ("w" "window configuration to register" window-configuration-to-register)
-      ("x" "copy to register" copy-to-register))
+      ("x" "copy to register" copy-to-register)))
 
     (isearch
      (description "Isearch, occur and highlighting")
@@ -217,7 +199,6 @@
       ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight)))
 
     (isearch-highlight
-
      (actions
       ("f" "hi lock find patterns" hi-lock-find-patterns)
       ("l" "highlight lines matching regexp" highlight-lines-matching-regexp)
