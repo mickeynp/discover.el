@@ -192,6 +192,11 @@
      (lisp-switches
       ("-cf" "Case should fold search" case-fold-search t nil)
       )
+     (lisp-arguments
+      ("=l" "context lines to show (occur)"
+       "list-matching-lines-default-context-lines"
+       (lambda (dummy) (interactive) (read-number "Number of context lines to show: ")))
+      )
      (actions
       ("_" "isearch forward symbol" isearch-forward-symbol)
       ("o" "occur" occur)
