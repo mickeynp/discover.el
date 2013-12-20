@@ -263,7 +263,8 @@ Key bindings:
 (defun discover-mode-turn-on ()
   "Enable `discover-mode' if appropriate for this buffer."
   (unless (or (minibufferp) (eq 'makey-key-mode major-mode))
-    (discover-mode 1)))
+    (discover-mode 1)
+    (discover-turn-on-in-dired)))
 
 (provide 'discover)
 ;;; discover.el ends here
