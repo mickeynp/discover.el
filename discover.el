@@ -30,73 +30,79 @@
     (dired
      (description "DIRectory EDitor")
      (actions
-      ("DEL" "unmark backward" dired-unmark-backward)
-      ("RET" "find file" dired-find-file)
-      ("SPC" "next line" dired-next-line)
-      ("A" "search marked" dired-do-search)
-      ("B" "byte compile marked" dired-do-byte-compile)
-      ("C" "copy marked" dired-do-copy)
-      ("D" "delete marked" dired-do-delete)
-      ("F" "find marked files marked" dired-do-find-marked-files)
-      ("G" "chgrp marked" dired-do-chgrp)
-      ("H" "hardlink marked" dired-do-hardlink)
-      ("L" "load marked" dired-do-load)
-      ("M" "chmod marked" dired-do-chmod)
-      ("O" "chown marked" dired-do-chown)
-      ("P" "print marked" dired-do-print)
-      ("Q" "query replace regexp marked" dired-do-query-replace-regexp)
-      ("R" "rename marked" dired-do-rename)
-      ("S" "symlink marked" dired-do-symlink)
-      ("T" "touch marked" dired-do-touch)
-      ("V" "run mail marked" dired-do-run-mail)
-      ("X" "shell command marked" dired-do-shell-command)
-      ("k" "kill lines marked" dired-do-kill-lines)
-      ("l" "redisplay marked" dired-do-redisplay)
-      ("Y" "relsymlink marked" dired-do-relsymlink)
-      ("Z" "compress marked" dired-do-compress)
-      ("!" "shell command marked" dired-do-shell-command)
-      ("&" "async shell command marked" dired-do-async-shell-command)
+      ("Navigation"
+       ("DEL" "unmark backward" dired-unmark-backward)
+       ("RET" "find file" dired-find-file)
+       ("SPC" "next line" dired-next-line)
+       ("<" "prev dirline" dired-prev-dirline)
+       (">" "next dirline" dired-next-dirline)
+       ("^" "up directory" dired-up-directory)
+       ("j" "goto file" dired-goto-file)
+       ("i" "maybe insert subdir" dired-maybe-insert-subdir)
+       ("n" "next line" dired-next-line)
+       ("p" "previous line" dired-previous-line)
+       ("v" "view file" dired-view-file)
+       ("w" "copy filename as kill" dired-copy-filename-as-kill))
 
-      ("#" "flag auto save files" dired-flag-auto-save-files)
-      ("$" "hide subdir" dired-hide-subdir)
-      ("+" "create directory" dired-create-directory)
-      ("." "clean directory" dired-clean-directory)
-      ("<" "prev dirline" dired-prev-dirline)
-      ("=" "diff" dired-diff)
-      (">" "next dirline" dired-next-dirline)
-      ("C-o" "display file" dired-display-file)
-      ("I" "info" dired-info)
-      ("N" "man" dired-man)
-      ("U" "unmark all marks" dired-unmark-all-marks)
-      ("^" "up directory" dired-up-directory)
-      ("a" "find alternate file" dired-find-alternate-file)
-      ("d" "flag file deletion" dired-flag-file-deletion)
-      ("g" "revert buffer" revert-buffer)
-      ("i" "maybe insert subdir" dired-maybe-insert-subdir)
-      ("j" "goto file" dired-goto-file)
-      ("m" "mark" dired-mark)
-      ("n" "next line" dired-next-line)
-      ("o" "find file other window" dired-find-file-other-window)
-      ("p" "previous line" dired-previous-line)
-      ;; this will also kill the `dired' window. On one hand, it makes
-      ;; sense: we're just feeding the commands straight to to dired
-      ;; and `q' will indeed quit the dired window. On the other hand,
-      ;; sometimes you just want to close the context menu -- and
-      ;; you'd naturally do that with q.
+      ("Marked file"
+       ("A" "search marked" dired-do-search)
+       ("B" "byte compile marked" dired-do-byte-compile)
+       ("C" "copy marked" dired-do-copy)
+       ("D" "delete marked" dired-do-delete)
+       ("F" "find marked files marked" dired-do-find-marked-files)
+       ("G" "chgrp marked" dired-do-chgrp)
+       ("H" "hardlink marked" dired-do-hardlink)
+       ("L" "load marked" dired-do-load)
+       ("M" "chmod marked" dired-do-chmod)
+       ("O" "chown marked" dired-do-chown)
+       ("P" "print marked" dired-do-print)
+       ("Q" "query replace regexp marked" dired-do-query-replace-regexp)
+       ("R" "rename marked" dired-do-rename)
+       ("S" "symlink marked" dired-do-symlink)
+       ("T" "touch marked" dired-do-touch)
+       ("V" "run mail marked" dired-do-run-mail)
+       ("X" "shell command marked" dired-do-shell-command)
+       ("k" "kill lines marked" dired-do-kill-lines)
+       ("l" "redisplay marked" dired-do-redisplay)
+       ("Y" "relsymlink marked" dired-do-relsymlink)
+       ("Z" "compress marked" dired-do-compress)
+       ("!" "shell command marked" dired-do-shell-command)
+       ("&" "async shell command marked" dired-do-async-shell-command))
 
-      ;; ("q" "quit window" quit-window)
-      ("s" "sort toggle or edit" dired-sort-toggle-or-edit)
-      ("t" "toggle marks" dired-toggle-marks)
-      ("u" "unmark" dired-unmark)
-      ("v" "view file" dired-view-file)
-      ("w" "copy filename as kill" dired-copy-filename-as-kill)
-      ("x" "delete flagged" dired-do-flagged-delete)
-      ("y" "show file type" dired-show-file-type)
-      ("~" "flag backup files" dired-flag-backup-files)
-      ;; prefix commands for further nesting
-      ("%" "do by regexp ..." makey-key-mode-popup-dired-regexp)
-      ("*" "mark ..." makey-key-mode-popup-dired-marking)
-      ("M-s" "isearch ..." makey-key-mode-popup-dired-isearch-meta)))
+      ("Misc"
+       ("+" "create directory" dired-create-directory)
+       ("." "clean directory" dired-clean-directory)
+       ("#" "flag auto save files" dired-flag-auto-save-files)
+       ("$" "hide subdir" dired-hide-subdir)
+       ("=" "diff" dired-diff)
+       ("C-o" "display file" dired-display-file)
+       ("I" "info" dired-info)
+       ("N" "man" dired-man)
+       ("U" "unmark all marks" dired-unmark-all-marks)
+       ("a" "find alternate file" dired-find-alternate-file)
+       ("d" "flag file deletion" dired-flag-file-deletion)
+       ("g" "revert buffer" revert-buffer)
+       ("m" "mark" dired-mark)
+       ("o" "find file other window" dired-find-file-other-window)
+       ("s" "sort toggle or edit" dired-sort-toggle-or-edit)
+       ("t" "toggle marks" dired-toggle-marks)
+       ("u" "unmark" dired-unmark)
+       ("x" "delete flagged" dired-do-flagged-delete)
+       ("y" "show file type" dired-show-file-type)
+       ("~" "flag backup files" dired-flag-backup-files)
+       ) ;; prefix commands for further nesting
+      ("More"
+       ("%" "do by regexp ..." makey-key-mode-popup-dired-regexp)
+       ("*" "mark ..." makey-key-mode-popup-dired-marking)
+       ("M-s" "isearch ..." makey-key-mode-popup-dired-isearch-meta)))
+     ;; this will also kill the `dired' window. On one hand, it makes
+     ;; sense: we're just feeding the commands straight to to dired
+     ;; and `q' will indeed quit the dired window. On the other hand,
+     ;; sometimes you just want to close the context menu -- and
+     ;; you'd naturally do that with q.
+
+     ;; ("q" "quit window" quit-window)
+     )
 
     ;; These three context menus should drive home how many layers of
     ;; key bindings dired has!
@@ -146,7 +152,6 @@
        ("t" "toggle marks" dired-toggle-marks)
        ("u" "unmark selected" dired-unmark)
        ("DEL" dired-unmark-backward))))
-
     (dired-regexp
      (description "Do by marked or flagged files matching a regexp")
      (actions
@@ -206,22 +211,25 @@
      (lisp-arguments
       ("=l" "context lines to show (occur)"
        "list-matching-lines-default-context-lines"
-       (lambda (dummy) (interactive) (read-number "Number of context lines to show: ")))
-      )
+       (lambda (dummy) (interactive) (read-number "Number of context lines to show: "))))
      (actions
-      ("_" "isearch forward symbol" isearch-forward-symbol)
-      ("o" "occur" occur)
-      ("w" "isearch forward word" isearch-forward-word)
-      ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight)))
-
+      ("Isearch"
+       ("_" "isearch forward symbol" isearch-forward-symbol)
+       ("w" "isearch forward word" isearch-forward-word))
+      ("Occur"
+       ("o" "occur" occur))
+      ("More"
+       ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
     (isearch-highlight
      (actions
-      ("f" "hi lock find patterns" hi-lock-find-patterns)
-      ("l" "highlight lines matching regexp" highlight-lines-matching-regexp)
-      ("p" "highlight phrase" highlight-phrase)
-      ("r" "highlight regexp" highlight-regexp)
-      ("u" "unhighlight regexp" unhighlight-regexp)
-      ("w" "hi lock write interactive patterns" hi-lock-write-interactive-patterns)))))
+      ("Highlight"
+       ("l" "highlight lines matching regexp" highlight-lines-matching-regexp)
+       ("p" "highlight phrase" highlight-phrase)
+       ("r" "highlight regexp" highlight-regexp)
+       ("u" "unhighlight regexp" unhighlight-regexp))
+      ("Store"
+       ("f" "hi lock find patterns" hi-lock-find-patterns)
+       ("w" "hi lock write interactive patterns" hi-lock-write-interactive-patterns))))))
 
 (makey-initialize-key-groups discover-context-menus)
 
