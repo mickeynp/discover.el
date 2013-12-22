@@ -23,7 +23,7 @@
 
 ;;; Code:
 
-(require 'makey-key-mode)
+(require 'makey)
 
 (defconst discover-context-menus
   '(
