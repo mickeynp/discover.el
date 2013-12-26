@@ -20,10 +20,28 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+;;
+;; discover.el adds context menus to commonly-used features in
+;; Emacs. The context menu functionality is provided by makey.el, a
+;; library based on the popup menus used in Magit.
+;;
+;; For more information read this:
+;;
+;; http://www.masteringemacs.org/articles/2013/12/21/discoverel-discover-emacs-context-menus/
+;;
 
 ;;; Code:
 
 (require 'makey)
+
+(defvar discover-mode-hook nil
+  "Functions to call after `discover-mode' is set.
+
+This is a good place to define additional global keys against
+`discover-mode-map'.
+
+This is also a good place to define keys for third-party packages
+by updating their mode maps directly.")
 
 (defconst discover-context-menus
   '(
@@ -255,6 +273,7 @@
 Key bindings:
 \\{discover-map}"
   :keymap discover-map
+  :require 'makey
   :group 'discover)
 
 ;;;###autoload
