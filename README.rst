@@ -26,10 +26,17 @@ If you want to support `discover.el` you can use the following snippet as a base
         ("C-s" "insert snippet" yas-insert-snippet)
         ("C-v" "visit snippet file" yas-visit-snippet-file))))))
 
- (when (featurep 'discover)
+ (when (and (featurep 'discover) (featurep 'makey))
    (makey-initialize-key-groups myfeature-context-menus)
    ;; bind a key to the dynamically created command
    ;; `makey-key-mode-popup-yasnippet'
-   )
+   (add-hook 'discover-mode-hook
+             #'(lambda () (define-key discover-map (kbd "C-x &") 'makey-key-mode-popup-yasnippet))))
 
-The example above creates one context menu called `yasnippet`. Attached to it are three actions in the `Snippet` category. When `makey-initialize-key-groups` are run with `myfeature-context-menus` dynamic lisp commands are created. They are named `makey-key-mode-popup-<menu>` where `<menu>` in the example above would be `yasnippet`. For more example usage see the very readable `discover.el`!
+The example above creates one context menu called `yasnippet`. Attached to it are three actions in the `Snippet` actions category. For more advanced examples you should read the source for `discover.el`. It's very readable.
+
+When `makey-initialize-key-groups` is called with the constant `myfeature-context-menus` the context menu is created. This is done dynamically when that function is called. They are named `makey-key-mode-popup-<menu>` where `<menu>` in the example above would be `yasnippet`.
+
+Finally, a hook is added to `discover-mode-hook`. In it `discover-map` is updated so it overrides the `C-x & ...` keybindings yasnippet normally defines. When `C-x &` is pressed and `discover-mode` is running the context menu is displayed instead. (Please don't bind a lambda to the hook variable though.)
+
+In the case of yasnippet overriding the global key group makes sense. But you must then decide how you want to present the context menu to the user for your own package. Binding the context menus to `?` or `M-?` where appropriate is another way. It depends on your package: do you have a dedicated interface like `dired` or do you expose your package to users through key bindings or minor modes?
