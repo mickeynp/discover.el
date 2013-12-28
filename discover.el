@@ -4,6 +4,7 @@
 
 ;; Author: Mickey Petersen <mickey@fyeah.org>
 ;; Keywords:
+;; Version: 0.1
 ;; Package-Requires: ((makey "0.2"))
 
 ;; This program is free software; you can redistribute it and/or modify
