@@ -249,14 +249,44 @@ by updating their mode maps directly.")
        ("u" "unhighlight regexp" unhighlight-regexp))
       ("Store"
        ("f" "hi lock find patterns" hi-lock-find-patterns)
-       ("w" "hi lock write interactive patterns" hi-lock-write-interactive-patterns))))))
+       ("w" "hi lock write interactive patterns" hi-lock-write-interactive-patterns))))
+
+    (prodigy
+     (actions
+      ("Navigation"
+       ("n" "next service" prodigy-next)
+       ("p" "prev service" prodigy-prev)
+       ("M-<" "first service" prodigy-first)
+       ("M->" "last service" prodigy-last))
+      ("Marking"
+       ("m" "mark service" prodigy-mark)
+       ("t" "mark services with tag" prodigy-mark-tag)
+       ("M" "mark all services" prodigy-mark-all)
+       ("u" "unmark service" prodigy-unmark)
+       ("T" "unmark services with tag" prodigy-unmark-tag)
+       ("U" "unmark all services" prodigy-unmark-all))
+      ("Process"
+       ("s" "start service" prodigy-start)
+       ("S" "stop service" prodigy-stop)
+       ("r" "restart service" prodigy-restart)
+       ("$" "display service process buffer" prodigy-display-process))
+      ("Filters"
+       ("f t" "add tag filter" prodigy-add-tag-filter)
+       ("f n" "add name filter" prodigy-add-name-filter)
+       ("F" "clear all filters" prodigy-clear-filters))
+      ("Misc"
+       ("o" "open in browser" prodigy-browse))))))
 
 (makey-initialize-key-groups discover-context-menus)
 
 (defun discover-turn-on-in-dired ()
   (local-set-key (kbd "?") 'makey-key-mode-popup-dired))
 
+(defun discover-turn-on-in-prodigy ()
+  (local-set-key (kbd "?") 'makey-key-mode-popup-prodigy))
+
 (add-hook 'dired-mode-hook 'discover-turn-on-in-dired)
+(add-hook 'prodigy-mode-hook 'discover-turn-on-in-prodigy)
 
 ;;; Default Keybindings
 (defvar discover-map
