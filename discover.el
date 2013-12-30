@@ -252,7 +252,7 @@
 
 Example 1. Enable Discover in a mode:
 
-    (discover-add-key-group
+    (discover-add-context-menu
        :context-menu (mygroup ... )
        :mode 'dired-mode
        :mode-hook 'dired-mode-hook
@@ -270,7 +270,7 @@ in :bind.
 
 Example 2. Globalized Discover Support:
 
-    (discover-add-key-group
+    (discover-add-context-menu
        :context-menu (mygroup ...)
        :bind \"C-x r\")
 

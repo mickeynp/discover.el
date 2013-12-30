@@ -18,7 +18,7 @@ Third-party module support
 --------------------------
 If you want to support ``discover.el`` you must use the function ``discover-add-context-menu``, like so::
 
-  (discover-add-key-group
+  (discover-add-context-menu
    :context-menu (isearch
                 (description "Isearch, occur and highlighting")
                 (lisp-switches
@@ -44,7 +44,7 @@ Under the hood a command is dynamically created to set the key when ``discover-m
 
 To create a context menu that is only available to a specific mode is very easy, and is essentially an extension of the example above. This time I will use ``dired`` to demonstrate this::
 
-  (discover-add-key-group
+  (discover-add-context-menu
    :context-menu (dired ...)
    :bind "?"
    :mode 'dired-mode
@@ -55,8 +55,9 @@ As you can see, there is not much else to it. This will bind another dynamic com
 
 The string you give in ``:bind`` will be passed directly to ``kbd`` -- so no need to escape anything!
 
-You may want to check if ``discover`` is present before you call ``discover-add-key-group``. The easiest way is to check for its presence, like so::
+You may want to check if ``discover`` is present before you call ``discover-add-context-menu``. The easiest way is to check for its presence, like so::
 
   (when (featurep 'discover)
-    (discover-add-key-group
+    (discover-add-context-menu
        ... ))
+
