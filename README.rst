@@ -42,7 +42,7 @@ This will create a keybinding ``M-s`` against ``discover-mode``, making it gener
    
 Under the hood a command is dynamically created to set the key when ``discover-mode-hook`` is called.
 
-To create a context menu that is only available to a specific is very easy, and is essentially an extension of the example above. This time I will use ``dired`` to demonstrate this::
+To create a context menu that is only available to a specific mode is very easy, and is essentially an extension of the example above. This time I will use ``dired`` to demonstrate this::
 
   (discover-add-key-group
    :context-menu (dired ...)
