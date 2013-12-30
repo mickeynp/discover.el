@@ -106,9 +106,9 @@
        ("~" "flag backup files" dired-flag-backup-files)
        ) ;; prefix commands for further nesting
       ("More"
-       ("%" "do by regexp ..." makey-key-mode-popup-dired-regexp)
-       ("*" "mark ..." makey-key-mode-popup-dired-marking)
-       ("M-s" "isearch ..." makey-key-mode-popup-dired-isearch-meta)))
+       ("%" "do by regexp ..." (discover-get-context-menu-command-name 'dired-regexp))
+       ("*" "mark ..." (discover-get-context-menu-command-name 'dired-marking))
+       ("M-s" "isearch ..." (discover-get-context-menu-command-name 'dired-isearch-meta))))
      ;; this will also kill the `dired' window. On one hand, it makes
      ;; sense: we're just feeding the commands straight to to dired
      ;; and `q' will indeed quit the dired window. On the other hand,
@@ -124,16 +124,16 @@
      (description "Isearch in files or over files in dired")
      (actions
       ("Isearch"
-       ("<backspace>" "... back" makey-key-mode-popup-dired)
-       ("f" "isearch for files ..." makey-key-mode-popup-dired-isearch-for-filenames)
-       ("a" "isearch in files ..." makey-key-mode-popup-dired-isearch-in-filenames))
+       ("<backspace>" "... back" (discover-get-context-menu-command-name 'dired))
+       ("f" "isearch for files ..." (discover-get-context-menu-command-name 'dired-isearch-for-filenames))
+       ("a" "isearch in files ..." (discover-get-context-menu-command-name 'dired-isearch-in-filenames)))
       ))
 
     (dired-isearch-for-filenames
      (description "Isearch for files in dired")
      (actions
       ("Isearch"
-       ("<backspace>" "... back" makey-key-mode-popup-dired-isearch-meta)
+       ("<backspace>" "... back" (discover-get-context-menu-command-name 'dired-isearch-meta))
        ("C-s" "isearch filenames" dired-isearch-filenames)
        ("C-M-s" "isearch filenames regexp" dired-isearch-filenames-regexp))))
 
@@ -141,7 +141,7 @@
      (description "Isearch in marked files")
      (actions
       ("Isearch"
-       ("<backspace>" "... back" makey-key-mode-popup-dired-isearch-meta)
+       ("<backspace>" "... back" (discover-get-context-menu-command-name 'dired-isearch-meta))
        ("C-s" "isearch marked" dired-do-isearch)
        ("C-M-s" "isearch regexp marked" dired-do-isearch-regexp))))
 
@@ -233,7 +233,7 @@
       ("Occur"
        ("o" "occur" occur))
       ("More"
-       ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
+       ("h" "highlighters ..." (discover-get-context-menu-command-name 'isearch-highlight)))))
     (isearch-highlight
      (actions
       ("Highlight"
@@ -244,6 +244,19 @@
       ("Store"
        ("f" "hi lock find patterns" hi-lock-find-patterns)
        ("w" "hi lock write interactive patterns" hi-lock-write-interactive-patterns))))))
+
+
+(defun discover-get-context-menu-command-name (group-name)
+  "Returns a context menu name from a GROUP-NAME"
+  (let ((context-menu (intern (concat "makey-key-mode-popup-" (symbol-name group-name)))))
+    (if (commandp context-menu)
+        context-menu
+      (error "No context menu command named `%s' exist." (symbol-name group-name)))))
+
+;;;###autoload
+(defun discover-show-context-menu (group-name)
+  "Shows a context menu GROUP-NAME"
+  (funcall (discover-get-context-menu-command-name group-name)))
 
 ;;;###autoload
 (defun discover-add-context-menu (&rest properties)
@@ -301,7 +314,9 @@ Notes:
 
 You can only bind one menu per call to discover. The bound name
 given to the key group is taken from the `car' in the list passed
-to :context-menu. The name is `makey-key-mode-popup-xxxx'."
+to :context-menu. You can retrieve the command symbol for the
+context menu by calling `discover-get-context-menu-command-name'
+with the symbol name of the context menu.."
   (let* ((context-menu (plist-get properties :context-menu))
          ;; name of the context menu group. e.g., `isearch'
          (group-name (car context-menu))
@@ -321,8 +336,8 @@ to :context-menu. The name is `makey-key-mode-popup-xxxx'."
               "Turns on discover support"
               (interactive)
               (local-set-key ,bind-key
-                             ',(intern (concat "makey-key-mode-popup-"
-                                               (symbol-name group-name))))))
+                             ',(intern (symbol-name (discover-get-context-menu-command-name
+                                                     group-name))))))
           (if mode (add-hook mode-hook (intern function-name))
             (add-hook 'discover-mode-hook (intern function-name))))))
 
