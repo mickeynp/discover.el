@@ -16,27 +16,51 @@ Install it from MELPA. It's called ``discover``.
 
 Third-party module support
 --------------------------
-If you want to support ``discover.el`` you can use the following snippet as a baseline::
+If you want to support ``discover.el`` you must use the function ``discover-add-context-menu``, like so::
 
- (defconst myfeature-context-menus
-   '((yasnippet
-      (actions
-       ("Snippet"
-        ("C-n" "new snippet" yas-new-snippet)
-        ("C-s" "insert snippet" yas-insert-snippet)
-        ("C-v" "visit snippet file" yas-visit-snippet-file))))))
+  (discover-add-context-menu
+   :context-menu (isearch
+                (description "Isearch, occur and highlighting")
+                (lisp-switches
+                 ("-cf" "Case should fold search" case-fold-search t nil))
+                (lisp-arguments
+                 ("=l" "context lines to show (occur)"
+                  "list-matching-lines-default-context-lines"
+                  (lambda (dummy) (interactive) (read-number "Number of context lines to show: "))))
+                (actions
+                 ("Isearch"
+                  ("_" "isearch forward symbol" isearch-forward-symbol)
+                  ("w" "isearch forward word" isearch-forward-word))
+                 ("Occur"
+                  ("o" "occur" occur))
+                 ("More"
+                  ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
+   :bind "M-s")
 
- (when (and (featurep 'discover) (featurep 'makey))
-   (makey-initialize-key-groups myfeature-context-menus)
-   ;; bind a key to the dynamically created command
-   ;; `makey-key-mode-popup-yasnippet'
-   (add-hook 'discover-mode-hook
-             #'(lambda () (define-key discover-map (kbd "C-x &") 'makey-key-mode-popup-yasnippet))))
 
-The example above creates one context menu called ``yasnippet``. Attached to it are three actions in the ``Snippet`` actions category. For more advanced examples you should read the source for ``discover.el``. It's very readable.
+This will create a keybinding ``M-s`` against ``discover-mode``, making it generally available.
+   
+Under the hood a command is dynamically created to set the key when ``discover-mode-hook`` is called.
 
-When ``makey-initialize-key-groups`` is called with the constant ``myfeature-context-menus`` the context menu is created. This is done dynamically when that function is called. They are named ``makey-key-mode-popup-<menu>`` where ``<menu>`` in the example above would be ``yasnippet``.
+To create a context menu that is only available to a specific mode is very easy, and is essentially an extension of the example above. This time I will use ``dired`` to demonstrate this::
 
-Finally, a hook is added to ``discover-mode-hook``. In it ``discover-map`` is updated so it overrides the ``C-x & ...`` keybindings yasnippet normally defines. When ``C-x &`` is pressed and ``discover-mode`` is running the context menu is displayed instead. (Please don't bind a lambda to the hook variable though.)
+  (discover-add-context-menu
+   :context-menu (dired ...)
+   :bind "?"
+   :mode 'dired-mode
+   :mode-hook 'dired-mode-hook
+  )
 
-In the case of yasnippet overriding the global key group makes sense. But you must then decide how you want to present the context menu to the user for your own package. Binding the context menus to ``?`` or ``M-?`` where appropriate is another way. It depends on your package: do you have a dedicated interface like ``dired`` or do you expose your package to users through key bindings or minor modes?
+As you can see, there is not much else to it. This will bind another dynamic command, but this time it will be against the hook specified in the property ``:mode-hook``. You must ensure you pick the correct mode hook; usually it is named after the major mode.
+
+The string you give in ``:bind`` will be passed directly to ``kbd`` -- so no need to escape anything!
+
+You may want to check if ``discover`` is present before you call ``discover-add-context-menu``. The easiest way is to check for its presence, like so::
+
+  (when (featurep 'discover)
+    (discover-add-context-menu
+       ... ))
+
+Useful Helper Commands
+~~~~~~~~~~~~~~~~~~~~~~
+You can get the name of the command that reveals a given context menu by calling ``discover-get-context-menu-command-name``. If you just want to funcall the returned symbol, the function ``discover-show-context-menu`` will do this for you.
