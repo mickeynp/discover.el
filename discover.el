@@ -36,13 +36,7 @@
 (require 'makey)
 
 (defvar discover-mode-hook nil
-  "Functions to call after `discover-mode' is set.
-
-This is a good place to define additional global keys against
-`discover-mode-map'.
-
-This is also a good place to define keys for third-party packages
-by updating their mode maps directly.")
+  "Functions to call after `discover-mode' is set.")
 
 (defconst discover-context-menus
   '(
@@ -251,21 +245,132 @@ by updating their mode maps directly.")
        ("f" "hi lock find patterns" hi-lock-find-patterns)
        ("w" "hi lock write interactive patterns" hi-lock-write-interactive-patterns))))))
 
-(makey-initialize-key-groups discover-context-menus)
+;;;###autoload
+(defun discover-add-context-menu (&rest properties)
+  "Save a context menu to Discover and bind it to the correct keys.
 
-(defun discover-turn-on-in-dired ()
-  (local-set-key (kbd "?") 'makey-key-mode-popup-dired))
 
-(add-hook 'dired-mode-hook 'discover-turn-on-in-dired)
+Example 1. Enable Discover in a mode:
+
+    (discover-add-key-group
+       :context-menu (mygroup ... )
+       :mode 'dired-mode
+       :mode-hook 'dired-mode-hook
+       :bind \"?\")
+
+This will bind a function named `dired-mode-turn-on-mygroup' to
+the hook `dired-mode-hook' specified in :mode-hook. The name for
+the function is `<foo>-turn-on-discover' where `<foo>' is the
+`car' symbol in :context-menu - better known as the name of the
+context menu.
+
+The function will call `local-set-key' with the binding given
+in :bind.
+
+
+Example 2. Globalized Discover Support:
+
+    (discover-add-key-group
+       :context-menu (mygroup ...)
+       :bind \"C-x r\")
+
+As above, this will bind a function but this one is called
+`discover--turn-on-mygroup' and is set when `discover-mode' is
+set. This enables you to create \"global\" keybindings (that
+nevertheless only take effect when `discover-mode' or
+`global-discover-mode' is enabled) instead of local
+ones. Omitting :mode and :mode-hook is all it takes.
+
+PList Definitions:
+
+:context-menu is a menu definition. See `discover-context-menus'.
+
+:mode is a major mode symbol where the key in :bind take
+effect. If major mode is `nil' then the key is defined against
+`discover-mode' and is thus in effect when `discover-mode' is
+enabled.
+
+:mode-hook is the name of the mode hook where the context menu
+key gets bound. Usually it's `<name>-mode-hook'. This property is
+redundant if :mode is nil.
+
+:bind is a string, to be passed to `kbd', that the context menu
+will be bound to.
+
+Notes:
+
+You can only bind one menu per call to discover. The bound name
+given to the key group is taken from the `car' in the list passed
+to :context-menu. The name is `makey-key-mode-popup-xxxx'."
+  (let* ((context-menu (plist-get properties :context-menu))
+         ;; name of the context menu group. e.g., `isearch'
+         (group-name (car context-menu))
+         (mode-hook (plist-get properties :mode-hook))
+         (bind-key (kbd (plist-get properties :bind)))
+         (mode (plist-get properties :mode))
+         (hook (plist-get properties :hook)))
+    (unless context-menu
+      (error ":context-menu cannot be nil!"))
+    (makey-initialize-key-groups (list context-menu))
+    ;; if we have a major mode then we build a function for
+    ;; `<mode>-hook' that enables it.
+    (let* ((function-name (if mode (concat (symbol-name group-name) "-turn-on-discover")
+                            (concat "discover--turn-on-" (symbol-name group-name)))))
+          (eval
+           `(defun ,(intern function-name) nil
+              "Turns on discover support"
+              (interactive)
+              (local-set-key ,bind-key
+                             ',(intern (concat "makey-key-mode-popup-"
+                                               (symbol-name group-name))))))
+          (if mode (add-hook mode-hook (intern function-name))
+            (add-hook 'discover-mode-hook (intern function-name))))))
 
 ;;; Default Keybindings
-(defvar discover-map
-  (let ((m (make-sparse-keymap)))
-    ;; this overrides rectangles. this is what we want
-    (define-key m (kbd "C-x r") 'makey-key-mode-popup-rectangles)
-    (define-key m (kbd "M-s") 'makey-key-mode-popup-isearch)
-    m)
+(defvar discover-map (make-sparse-keymap)
   "Keymap for `discover'.")
+
+(defconst discover--context-menu-mappings
+  ;; group-name in `discover-context-menus'; major-mode symbol;
+  ;; major-mode hook; and key to bind to.
+  ;;
+  ;; Both major-mode and major-mode hook can be nil.
+  '(
+    ;; Dired
+    (dired dired-mode dired-mode-hook "?")
+    (dired-isearch-meta dired-mode dired-mode-hook "M-s")
+    (dired-marking dired-mode dired-mode-hook "*")
+    (dired-regexp dired-mode dired-mode-hook "%")
+    ;; Rectangles - C-x r ...
+    (rectangles nil nil "C-x r")
+    ;; Isearch
+    (isearch nil nil "M-s"))
+  "Mappings for `discover-context-menus'
+
+This constant is meant for internal use. Third-party package
+writers should call `discover-add-context-menu' directly.
+
+Each list element must follow the following format
+
+    (GROUP-NAME MODE-NAME MODE-HOOK-NAME BINDING)
+
+Both MODE-HOOK-NAME and MODE-NAME can be nil.")
+
+;;; Initialization code for our own mappings. This keeps the context
+;;; menus in one constant, `discover-context-menus', and avoids
+;;; binding interface-specific keys and so forth to the context menu
+;;; metadata.
+;;;###autoload
+(dolist (mapping discover--context-menu-mappings)
+  (let ((group-name (nth 0 mapping))
+        (mode (nth 1 mapping))
+        (mode-hook (nth 2 mapping))
+        (bind (nth 3 mapping)))
+    (discover-add-context-menu
+     :context-menu (assq group-name discover-context-menus)
+     :mode mode
+     :mode-hook mode-hook
+     :bind bind)))
 
 ;;;###autoload
 (define-minor-mode discover-mode
