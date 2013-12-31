@@ -375,7 +375,6 @@ Both MODE-HOOK-NAME and MODE-NAME can be nil.")
 ;;; menus in one constant, `discover-context-menus', and avoids
 ;;; binding interface-specific keys and so forth to the context menu
 ;;; metadata.
-;;;###autoload
 (dolist (mapping discover--context-menu-mappings)
   (let ((group-name (nth 0 mapping))
         (mode (nth 1 mapping))
