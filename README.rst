@@ -64,3 +64,9 @@ You may want to check if ``discover`` is present before you call ``discover-add-
 Useful Helper Commands
 ~~~~~~~~~~~~~~~~~~~~~~
 You can get the name of the command that reveals a given context menu by calling ``discover-get-context-menu-command-name``. If you just want to funcall the returned symbol, the function ``discover-show-context-menu`` will do this for you.
+
+
+Long-term Goals
+===============
+
+#. Replace makey.el with the rewritten version proposed by the Magit team.

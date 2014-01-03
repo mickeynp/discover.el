@@ -5,7 +5,7 @@
 ;; Author: Mickey Petersen <mickey@fyeah.org>
 ;; Keywords:
 ;; Version: 0.2
-;; Package-Requires: ((makey "0.2"))
+;; Package-Requires: ((makey "0.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -106,9 +106,9 @@
        ("~" "flag backup files" dired-flag-backup-files)
        ) ;; prefix commands for further nesting
       ("More"
-       ("%" "do by regexp ..." (discover-get-context-menu-command-name 'dired-regexp))
-       ("*" "mark ..." (discover-get-context-menu-command-name 'dired-marking))
-       ("M-s" "isearch ..." (discover-get-context-menu-command-name 'dired-isearch-meta))))
+       ("%" "do by regexp ..." makey-key-mode-popup-dired-regexp)
+       ("*" "mark ..." makey-key-mode-popup-dired-marking)
+       ("M-s" "isearch ..." makey-key-mode-popup-dired-isearch-meta)))
      ;; this will also kill the `dired' window. On one hand, it makes
      ;; sense: we're just feeding the commands straight to to dired
      ;; and `q' will indeed quit the dired window. On the other hand,
@@ -124,16 +124,16 @@
      (description "Isearch in files or over files in dired")
      (actions
       ("Isearch"
-       ("<backspace>" "... back" (discover-get-context-menu-command-name 'dired))
-       ("f" "isearch for files ..." (discover-get-context-menu-command-name 'dired-isearch-for-filenames))
-       ("a" "isearch in files ..." (discover-get-context-menu-command-name 'dired-isearch-in-filenames)))
+       ("<backspace>" "... back" makey-key-mode-popup-dired)
+       ("f" "isearch for files ..." makey-key-mode-popup-dired-isearch-for-filenames)
+       ("a" "isearch in files ..." makey-key-mode-popup-dired-isearch-in-filenames))
       ))
 
     (dired-isearch-for-filenames
      (description "Isearch for files in dired")
      (actions
       ("Isearch"
-       ("<backspace>" "... back" (discover-get-context-menu-command-name 'dired-isearch-meta))
+       ("<backspace>" "... back" makey-key-mode-popup-dired-isearch-meta)
        ("C-s" "isearch filenames" dired-isearch-filenames)
        ("C-M-s" "isearch filenames regexp" dired-isearch-filenames-regexp))))
 
@@ -141,7 +141,7 @@
      (description "Isearch in marked files")
      (actions
       ("Isearch"
-       ("<backspace>" "... back" (discover-get-context-menu-command-name 'dired-isearch-meta))
+       ("<backspace>" "... back" makey-key-mode-popup-dired-isearch-meta)
        ("C-s" "isearch marked" dired-do-isearch)
        ("C-M-s" "isearch regexp marked" dired-do-isearch-regexp))))
 
@@ -233,7 +233,7 @@
       ("Occur"
        ("o" "occur" occur))
       ("More"
-       ("h" "highlighters ..." (discover-get-context-menu-command-name 'isearch-highlight)))))
+       ("h" "highlighters ..." makey-key-mode-popup-isearch-highlight))))
     (isearch-highlight
      (actions
       ("Highlight"
@@ -257,6 +257,11 @@
 (defun discover-show-context-menu (group-name)
   "Shows a context menu GROUP-NAME"
   (funcall (discover-get-context-menu-command-name group-name)))
+
+;;;###autoload
+(defmacro discover-get-context-symbol (group-name)
+  "Macro that returns the context menu symbol for GROUP-NAME"
+  `(discover-get-context-menu-command-name ,group-name))
 
 ;;;###autoload
 (defun discover-add-context-menu (&rest properties)
@@ -321,25 +326,27 @@ with the symbol name of the context menu.."
          ;; name of the context menu group. e.g., `isearch'
          (group-name (car context-menu))
          (mode-hook (plist-get properties :mode-hook))
-         (bind-key (kbd (plist-get properties :bind)))
          (mode (plist-get properties :mode))
+         (bind (plist-get properties :bind))
          (hook (plist-get properties :hook)))
     (unless context-menu
       (error ":context-menu cannot be nil!"))
     (makey-initialize-key-groups (list context-menu))
     ;; if we have a major mode then we build a function for
     ;; `<mode>-hook' that enables it.
-    (let* ((function-name (if mode (concat (symbol-name group-name) "-turn-on-discover")
-                            (concat "discover--turn-on-" (symbol-name group-name)))))
-          (eval
-           `(defun ,(intern function-name) nil
-              "Turns on discover support"
-              (interactive)
-              (local-set-key ,bind-key
-                             ',(intern (symbol-name (discover-get-context-menu-command-name
-                                                     group-name))))))
-          (if mode (add-hook mode-hook (intern function-name))
-            (add-hook 'discover-mode-hook (intern function-name))))))
+    (when bind
+      (let* ((function-name (if mode (concat (symbol-name group-name) "-turn-on-discover")
+                             (concat "discover--turn-on-" (symbol-name group-name))))
+            (bind-key (kbd bind)))
+       (eval
+        `(defun ,(intern function-name) nil
+           "Turns on discover support"
+           (interactive)
+           (local-set-key ,bind-key
+                          ',(intern (symbol-name (discover-get-context-menu-command-name
+                                                  group-name))))))
+       (if mode (add-hook mode-hook (intern function-name))
+         (add-hook 'discover-mode-hook (intern function-name)))))))
 
 ;;; Default Keybindings
 (defvar discover-map (make-sparse-keymap)
@@ -365,6 +372,9 @@ with the symbol name of the context menu.."
 This constant is meant for internal use. Third-party package
 writers should call `discover-add-context-menu' directly.
 
+If you are defining \"meta-menus\" that are called only from
+within another context group you should not add them here.
+
 Each list element must follow the following format
 
     (GROUP-NAME MODE-NAME MODE-HOOK-NAME BINDING)
@@ -375,13 +385,15 @@ Both MODE-HOOK-NAME and MODE-NAME can be nil.")
 ;;; menus in one constant, `discover-context-menus', and avoids
 ;;; binding interface-specific keys and so forth to the context menu
 ;;; metadata.
-(dolist (mapping discover--context-menu-mappings)
-  (let ((group-name (nth 0 mapping))
-        (mode (nth 1 mapping))
-        (mode-hook (nth 2 mapping))
-        (bind (nth 3 mapping)))
+(dolist (menu discover-context-menus)
+  (let* ((mapping (assq (car menu)
+                        discover--context-menu-mappings))
+         (group-name (nth 0 mapping))
+         (mode (nth 1 mapping))
+         (mode-hook (nth 2 mapping))
+         (bind (nth 3 mapping)))
     (discover-add-context-menu
-     :context-menu (assq group-name discover-context-menus)
+     :context-menu menu
      :mode mode
      :mode-hook mode-hook
      :bind bind)))
