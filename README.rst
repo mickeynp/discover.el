@@ -19,7 +19,7 @@ Third-party module support
 If you want to support ``discover.el`` you must use the function ``discover-add-context-menu``, like so::
 
   (discover-add-context-menu
-   :context-menu (isearch
+   :context-menu '(isearch
                 (description "Isearch, occur and highlighting")
                 (lisp-switches
                  ("-cf" "Case should fold search" case-fold-search t nil))
@@ -45,7 +45,7 @@ Under the hood a command is dynamically created to set the key when ``discover-m
 To create a context menu that is only available to a specific mode is very easy, and is essentially an extension of the example above. This time I will use ``dired`` to demonstrate this::
 
   (discover-add-context-menu
-   :context-menu (dired ...)
+   :context-menu '(dired ...)
    :bind "?"
    :mode 'dired-mode
    :mode-hook 'dired-mode-hook
